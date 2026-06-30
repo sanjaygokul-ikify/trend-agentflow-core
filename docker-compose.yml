@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  api:
+    image: agentflow-api
+    ports:
+      - 8000:8000
+    depends_on:
+      - memory
+      - consensus
+  memory:
+    image: mongodb
+    volumes:
+      - memory_data:/data/db
+  consensus:
+    image: redis
+    restart: unless-stopped
+
+volumes:
+  memory_data:
