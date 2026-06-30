@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "agentflow-core"
+version = "0.1.0"
+description = "Distributed agent execution engine"
+authors = ["Principal Software Engineer <email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pymongo = "4.5.0"
+sanic = "23.12.1"
+cerberus = "2.3.2"
+pydantic = "2.6.4"
+redis = "4.6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
