@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import List, Optional
 import structlog
+import time
 
 logger = structlog.get_logger(__name__)
 
@@ -25,13 +26,19 @@ class SpeculationEngine:
     def __init__(self, persistent_memory: 'PersistentMemory'):
         self.persistent_memory = persistent_memory
         self.speculation_queue: List[AgentTask] = []
+        self.speculation_timeout: float = 10.0  # 10 seconds default timeout
 
     def speculate(self, task: AgentTask) -> bool:
         try:
             # Begin speculative execution transaction
             with self.persistent_memory.transaction() as tx:
                 # Perform speculative execution
+                start_time = time.time()
                 self.speculate_task(task, tx)
+                end_time = time.time()
+                # Check for timeout
+                if end_time - start_time > self.speculation_timeout:
+                    raise SpeculationError('Speculation timed out')
                 # If no exceptions occurred, commit the transaction
                 tx.commit()
                 return True
@@ -90,7 +97,7 @@ class Transaction:
 class PersistentMemory:
     def __init__(self, replication_factor: int):
         self.replication_factor = replication_factor
-        self.data: Dict[bytes, bytes] = {}
+        self.data: dict[bytes, bytes] = {}
 
     def put(self, key: bytes, value: bytes) -> None:
         # Store the given key-value pair in the persistent memory
@@ -107,6 +114,9 @@ class PersistentMemory:
         logger.info('Deleting data', key=key)
         if key in self.data:
             del self.data[key]
+
+    def transaction(self) -> 'Transaction':
+        return Transaction(self)
 
 class FaultDetector:
     def __init__(self, speculation_engine: SpeculationEngine):
