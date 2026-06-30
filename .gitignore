@@ -1,0 +1,1 @@
+__pycache__\n.env\n*.pyc\n*.log\n*.env\n*.sqlite\ncoverage/\ntmp/\ndocker-compose.override.yml\n.env.local
