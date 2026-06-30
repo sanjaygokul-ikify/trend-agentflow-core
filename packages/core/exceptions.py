@@ -1,0 +1,2 @@
+class SpeculationError(Exception):
+    pass
