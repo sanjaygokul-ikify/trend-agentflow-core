@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import List, Optional
 import structlog
+import time
 
 logger = structlog.get_logger(__name__)
 
@@ -16,7 +17,12 @@ class Executor:
             # Begin speculative execution transaction
             with self.speculation_engine.transaction() as tx:
                 # Perform speculative execution
+                start_time = time.time()
                 self.speculation_engine.speculate_task(task, tx)
+                end_time = time.time()
+                # Check for timeout
+                if end_time - start_time > self.speculation_engine.speculation_timeout:
+                    raise SpeculationError('Speculation timed out')
                 # If no exceptions occurred, commit the transaction
                 tx.commit()
                 return True
