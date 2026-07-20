@@ -71,6 +71,16 @@ class SpeculationEngine:
         finally:
             tx.close()
 
+    @property
+    def speculation_timeout(self) -> float:
+        return self._speculation_timeout
+
+    @speculation_timeout.setter
+    def speculation_timeout(self, value: float) -> None:
+        if value <= 0:
+            raise ValueError('Speculation timeout must be greater than 0')
+        self._speculation_timeout = value
+
 class Transaction:
     def __init__(self, persistent_memory: 'PersistentMemory'):
         self.persistent_memory = persistent_memory
