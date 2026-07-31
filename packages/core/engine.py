@@ -52,6 +52,13 @@ class SpeculationEngine:
         # This can involve executing the task's code, interacting with the environment,
         # and updating the agent's state
         logger.info('Speculating task', task=task)
+        try:
+            # Simulate task execution
+            time.sleep(0.1)
+        except Exception as e:
+            # Handle task execution error
+            logger.error('Task execution error', exc_info=e)
+            raise
 
     def abort_speculation(self, task: AgentTask) -> None:
         # Abort the speculative execution for the given task
